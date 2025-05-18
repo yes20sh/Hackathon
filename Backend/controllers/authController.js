@@ -12,6 +12,14 @@ const generateToken = (user) => {
   );
 };
 
+// Cookie options (secure and HttpOnly recommended)
+const cookieOptions = {
+  httpOnly: true,
+  // secure: true,  // enable in production (HTTPS)
+  sameSite: 'Strict',
+  maxAge: 1000 * 60 * 60 * 24, // 1 day in milliseconds
+};
+
 // @desc    Register a new user
 // @route   POST /api/auth/signup
 // @access  Public
@@ -23,23 +31,21 @@ export const signup = async (req, res) => {
   }
 
   try {
-    // Check if user exists
     let user = await User.findOne({ email });
     if (user) return res.status(400).json({ message: 'User already exists' });
 
-    // Hash password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Create user
     user = new User({ email, password: hashedPassword });
     await user.save();
 
-    // Generate token
     const token = generateToken(user);
 
+    // Set token in cookie
+    res.cookie('token', token, cookieOptions);
+
     res.status(201).json({
-      token,
       user: {
         id: user._id,
         email: user.email,
@@ -62,19 +68,18 @@ export const signin = async (req, res) => {
   }
 
   try {
-    // Find user
     const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ message: 'Invalid credentials' });
 
-    // Match password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
 
-    // Generate token
     const token = generateToken(user);
 
+    // Set token in cookie
+    res.cookie('token', token, cookieOptions);
+
     res.json({
-      token,
       user: {
         id: user._id,
         email: user.email,
@@ -84,4 +89,12 @@ export const signin = async (req, res) => {
     console.error(error);
     res.status(500).json({ message: 'Server error' });
   }
+};
+
+// @desc    Logout user
+// @route   POST /api/auth/logout
+// @access  Public
+export const logout = (req, res) => {
+  res.cookie('token', '', { maxAge: 0, httpOnly: true, sameSite: 'Strict' });
+  res.status(200).json({ message: 'Logged out successfully' });
 };

@@ -1,4 +1,3 @@
-// controllers/portfolioController.js
 import Portfolio from '../models/Portfolio.js';
 
 // @desc    Get current user's portfolio
@@ -29,12 +28,27 @@ export const createOrUpdatePortfolio = async (req, res) => {
     images,
   } = req.body;
 
+  // Ensure accomplishments is an array of objects with at least a 'title' field
+  const formattedAccomplishments = Array.isArray(accomplishments)
+    ? accomplishments.map(item => {
+        if (typeof item === 'string') {
+          // Convert string to object with title only
+          return { title: item };
+        } else if (typeof item === 'object' && item !== null) {
+          // Already an object, pass as is
+          return item;
+        }
+        // Fallback: skip invalid entries
+        return null;
+      }).filter(Boolean) // Remove any null entries
+    : [];
+
   const portfolioFields = {
     user: req.user.id,
     about,
     projects,
     experience,
-    accomplishments,
+    accomplishments: formattedAccomplishments,
     social,
     images,
   };
