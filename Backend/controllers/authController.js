@@ -1,4 +1,3 @@
-// controllers/authController.js
 import User from '../models/User.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
@@ -19,6 +18,10 @@ const generateToken = (user) => {
 export const signup = async (req, res) => {
   const { email, password } = req.body;
 
+  if (!email || !password) {
+    return res.status(400).json({ message: 'Email and password are required.' });
+  }
+
   try {
     // Check if user exists
     let user = await User.findOne({ email });
@@ -35,7 +38,13 @@ export const signup = async (req, res) => {
     // Generate token
     const token = generateToken(user);
 
-    res.status(201).json({ token });
+    res.status(201).json({
+      token,
+      user: {
+        id: user._id,
+        email: user.email,
+      }
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });
@@ -47,6 +56,10 @@ export const signup = async (req, res) => {
 // @access  Public
 export const signin = async (req, res) => {
   const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({ message: 'Email and password are required.' });
+  }
 
   try {
     // Find user
@@ -60,7 +73,13 @@ export const signin = async (req, res) => {
     // Generate token
     const token = generateToken(user);
 
-    res.json({ token });
+    res.json({
+      token,
+      user: {
+        id: user._id,
+        email: user.email,
+      }
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });

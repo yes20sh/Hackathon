@@ -1,4 +1,2 @@
-module.exports = {
-  secret: process.env.JWT_SECRET || 'your_jwt_secret_key_here',
-  expiresIn: '1d', 
-};
+export const secret = process.env.JWT_SECRET || 'your_jwt_secret_key_here';
+export const expiresIn = '1d';
