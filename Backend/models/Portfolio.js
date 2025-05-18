@@ -1,5 +1,5 @@
 // models/Portfolio.js
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const ProjectSchema = new mongoose.Schema({
   title: String,
@@ -49,4 +49,6 @@ const PortfolioSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model('Portfolio', PortfolioSchema);
+const Portfolio = mongoose.model('Portfolio', PortfolioSchema);
+
+export default Portfolio;

@@ -1,12 +1,13 @@
 // routes/portfolioRoutes.js
-const express = require('express');
-const router = express.Router();
-const authMiddleware = require('../middlewares/authMiddleware');
-const {
+import express from 'express';
+import authMiddleware from '../middlewares/authMiddleware.js';
+import {
   getMyPortfolio,
   createOrUpdatePortfolio,
   deletePortfolio,
-} = require('../controllers/portfolioController');
+} from '../controllers/portfolioController.js';
+
+const router = express.Router();
 
 // Use auth middleware to protect all below routes
 router.use(authMiddleware);
@@ -20,4 +21,4 @@ router.post('/', createOrUpdatePortfolio);
 // @route   DELETE /api/portfolio
 router.delete('/', deletePortfolio);
 
-module.exports = router;
+export default router;

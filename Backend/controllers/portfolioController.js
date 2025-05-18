@@ -1,10 +1,10 @@
 // controllers/portfolioController.js
-const Portfolio = require('../models/Portfolio');
+import Portfolio from '../models/Portfolio.js';
 
 // @desc    Get current user's portfolio
 // @route   GET /api/portfolio/me
 // @access  Private
-exports.getMyPortfolio = async (req, res) => {
+export const getMyPortfolio = async (req, res) => {
   try {
     const portfolio = await Portfolio.findOne({ user: req.user.id });
     if (!portfolio) return res.status(404).json({ message: 'Portfolio not found' });
@@ -19,7 +19,7 @@ exports.getMyPortfolio = async (req, res) => {
 // @desc    Create or update user's portfolio
 // @route   POST /api/portfolio
 // @access  Private
-exports.createOrUpdatePortfolio = async (req, res) => {
+export const createOrUpdatePortfolio = async (req, res) => {
   const {
     about,
     projects,
@@ -65,7 +65,7 @@ exports.createOrUpdatePortfolio = async (req, res) => {
 // @desc    Delete portfolio (optional)
 // @route   DELETE /api/portfolio
 // @access  Private
-exports.deletePortfolio = async (req, res) => {
+export const deletePortfolio = async (req, res) => {
   try {
     await Portfolio.findOneAndRemove({ user: req.user.id });
     res.json({ message: 'Portfolio deleted' });

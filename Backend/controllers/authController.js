@@ -1,8 +1,8 @@
 // controllers/authController.js
-const User = require('../models/User');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const { secret, expiresIn } = require('../config/jwt');
+import User from '../models/User.js';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import { secret, expiresIn } from '../config/jwt.js';
 
 // Helper to generate JWT token
 const generateToken = (user) => {
@@ -16,7 +16,7 @@ const generateToken = (user) => {
 // @desc    Register a new user
 // @route   POST /api/auth/signup
 // @access  Public
-exports.signup = async (req, res) => {
+export const signup = async (req, res) => {
   const { email, password } = req.body;
 
   try {
@@ -45,7 +45,7 @@ exports.signup = async (req, res) => {
 // @desc    Login user
 // @route   POST /api/auth/signin
 // @access  Public
-exports.signin = async (req, res) => {
+export const signin = async (req, res) => {
   const { email, password } = req.body;
 
   try {
