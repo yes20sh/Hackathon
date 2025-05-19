@@ -3,6 +3,17 @@ import mongoose from 'mongoose';
 
 const UserSchema = new mongoose.Schema(
   {
+    username: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+    },
+    fullName: {
+      type: String,
+      required: true,
+      trim: true,
+    },
     email: {
       type: String,
       required: true,
@@ -13,15 +24,6 @@ const UserSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true,
-    },
-    // Optional: social media links stored here if you want
-    social: {
-      linkedin: { type: String },
-      twitter: { type: String },
-      github: { type: String },
-      facebook: { type: String },
-      instagram: { type: String },
-      // Add others as needed
     },
   },
   { timestamps: true }

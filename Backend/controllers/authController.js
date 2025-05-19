@@ -12,42 +12,51 @@ const generateToken = (user) => {
   );
 };
 
-// Cookie options (secure and HttpOnly recommended)
+// Cookie options
 const cookieOptions = {
   httpOnly: true,
-  // secure: true,  // enable in production (HTTPS)
+  // secure: true, // Enable this in production (HTTPS)
   sameSite: 'Strict',
-  maxAge: 1000 * 60 * 60 * 24, // 1 day in milliseconds
+  maxAge: 1000 * 60 * 60 * 24, // 1 day
 };
 
 // @desc    Register a new user
 // @route   POST /api/auth/signup
 // @access  Public
 export const signup = async (req, res) => {
-  const { email, password } = req.body;
+  const { username, fullName, email, password } = req.body;
 
-  if (!email || !password) {
-    return res.status(400).json({ message: 'Email and password are required.' });
+  if (!username || !fullName || !email || !password) {
+    return res.status(400).json({ message: 'All fields are required.' });
   }
 
   try {
-    let user = await User.findOne({ email });
-    if (user) return res.status(400).json({ message: 'User already exists' });
+    let existingUser = await User.findOne({ $or: [{ email }, { username }] });
+    if (existingUser) {
+      return res.status(400).json({ message: 'Email or username already in use.' });
+    }
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    user = new User({ email, password: hashedPassword });
+    const user = new User({
+      username,
+      fullName,
+      email,
+      password: hashedPassword,
+    });
+
     await user.save();
 
     const token = generateToken(user);
 
-    // Set token in cookie
     res.cookie('token', token, cookieOptions);
 
     res.status(201).json({
       user: {
         id: user._id,
+        username: user.username,
+        fullName: user.fullName,
         email: user.email,
       }
     });
@@ -76,12 +85,13 @@ export const signin = async (req, res) => {
 
     const token = generateToken(user);
 
-    // Set token in cookie
     res.cookie('token', token, cookieOptions);
 
     res.json({
       user: {
         id: user._id,
+        username: user.username,
+        fullName: user.fullName,
         email: user.email,
       }
     });
