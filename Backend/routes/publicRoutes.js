@@ -1,16 +1,21 @@
-// routes/publicRoutes.js
 import express from 'express';
 import Portfolio from '../models/Portfolio.js';
+import User from '../models/User.js';
 
 const router = express.Router();
 
-// @route   GET /api/public/:userId
-// @desc    Get public portfolio data for any user by their userId
+// @route   GET /api/public/:username
+// @desc    Get public portfolio data by username
 // @access  Public
-router.get('/:userId', async (req, res) => {
+router.get('/:username', async (req, res) => {
   try {
-    const portfolio = await Portfolio.findOne({ user: req.params.userId })
-      .populate('user', 'email social');
+    const user = await User.findOne({ username: req.params.username }).select('_id fullName email');
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const portfolio = await Portfolio.findOne({ user: user._id }).populate('user', 'fullName email');
 
     if (!portfolio) {
       return res.status(404).json({ message: 'Portfolio not found' });
